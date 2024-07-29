@@ -1,33 +1,19 @@
-import express, { Express } from 'express';
-import helmet from 'helmet';
-import dotenv from 'dotenv';
-import { addReading, getReading } from './database';
+import express, { Express, Request, Response, NextFunction } from 'express'
+import helmet from 'helmet'
+import dotenv from 'dotenv'
+import { ReadingsValidator } from './middlewares/validators/readings.validator'
+import { FetchData, UpsertData } from './controller.ts/data.controller'
 
-dotenv.config();
+dotenv.config()
 
-const PORT = process.env.PORT || 3000;
-const app: Express = express();
+const PORT = process.env.PORT || 3000
+const app: Express = express()
 
-app.use(helmet());
-app.use(express.text());
-app.use(express.urlencoded({ extended: true }));
+app.use(helmet())
+app.use(express.text())
 
-app.post('/data', async (req, res) => {
-  // TODO: parse incoming data, and save it to the database
-  // data is of the form:
-  //  {timestamp} {name} {value}
+app.post('/data', ReadingsValidator as any, UpsertData as any)
 
-  // addReading(...)
+app.get('/data', FetchData)
 
-  return res.json({ success: false });
-});
-
-app.get('/data', async (req, res) => {
-  // TODO: check what dates have been requested, and retrieve all data within the given range
-
-  // getReading(...)
-
-  return res.json({ success: false });
-});
-
-app.listen(PORT, () => console.log(`Running on port ${PORT} ⚡`));
+app.listen(PORT, () => console.log(`Running on port ${PORT} ⚡`))
